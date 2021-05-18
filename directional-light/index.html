@@ -9,22 +9,48 @@
 
 function set_up_scene() {
 
+    var lat = 35.885 * Math.PI / 180.;
+    var lon = -106.306 * Math.PI / 180.;
+    // Sunrise at summer solstice:
+    var subsolar_lon = 3.2226102170765776 * Math.PI / 180.;
+    var subsolar_lat = 23.43697580860745 * Math.PI / 180.;
+    // Sunset at summer solstice:
+    subsolar_lon = 144.16794151204923 * Math.PI / 180.;
+    subsolar_lat = 23.434223851472446 * Math.PI / 180.;
+
     // scene
     var scene = new THREE.Scene();
 
-    // camera
-    var camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.set(0,-12,5);
-    camera.lookAt(new THREE.Vector3( 0, 5, 0 ));
+    // camera: fov, aspect ratio, near frustrum, far frustrum.
+    // The frustum defines the closest and farthest distances
+    // that will be rendered by the camera.
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
+                                             0.1, 1000 );
+
+    // Set the camera position to be over the given lon, lat position.
+    // x, y and z are toward viewer, up, left
+    // but that's according to Earth's initial rotation (coords 0, 0)
+    // so actually, it's: in direction of prime meridian, up,
+    // toward Pacific Ocean.
+    // Set left coordinate according to latitude:
+    //camera.position.set(5, 0, 0);
+    const CAMDISTANCE = 4;
+    camera.position.set(Math.cos(lon) * CAMDISTANCE,
+                        Math.sin(lat) * CAMDISTANCE,
+                        -Math.sin(lon) * CAMDISTANCE);
+    console.log("Camera position:", camera.position);
+
+    // Look toward the sphere, which will be centered at 0, 0, 0
+    camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
 
     // renderer
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize( window.innerWidth, window.innerHeight );
 
-    renderer.shadowMapEnabled = true;
+    renderer.shadowMap.enabled = true;
     renderer.shadowMapSoft = true;
 
-    //controls
+    // controls
     var controls = new THREE.OrbitControls( camera, renderer.domElement );
 
     //show canvas
@@ -33,50 +59,26 @@ function set_up_scene() {
     console.log("Container:", container);
     container.appendChild(renderer.domElement);
 
-    // lights
 
     // directional light
     var directionalLight = new THREE.DirectionalLight(0xffffff);
+    directionalLight.intensity = 1.5;
     directionalLight.position.set(5, 0, 5);
     directionalLight.target.position.set(0, 0, 0);
 
     directionalLight.castShadow = true;
-    directionalLight.shadowDarkness = 0.5;
-    directionalLight.shadowCameraVisible = true;
+    // directionalLight.shadowCameraVisible = true;
+    // deprecated, use HREE.CameraHelper( light.shadow.camera )
 
-    directionalLight.shadowCameraNear = 0;
-    directionalLight.shadowCameraFar = 15;
+    directionalLight.shadow.camera.near = 0;
+    directionalLight.shadow.camera.far = 15;
 
-    directionalLight.shadowCameraLeft = -5;
-    directionalLight.shadowCameraRight = 5;
-    directionalLight.shadowCameraTop = 5;
-    directionalLight.shadowCameraBottom = -5;
+    directionalLight.shadow.camera.left = -5;
+    directionalLight.shadow.camera.right = 5;
+    directionalLight.shadow.camera.top = 5;
+    directionalLight.shadow.camera.bottom = -5;
 
     scene.add(directionalLight);
-
-
-    // spotlight
-    var spotLight = new THREE.SpotLight( 0xffffff,1 );
-    spotLight.position.set( 5, 0, 6 );
-
-    spotLight.castShadow = true;
-    spotLight.shadowCameraVisible = true;
-
-    spotLight.target.position.set(-1, 0, 1 );
-    spotLight.shadowDarkness = 0.5;
-
-    spotLight.shadowCameraNear = 6;
-    spotLight.shadowCameraFar = 13;
-
-    scene.add( spotLight );
-
-
-    // plane
-    var geometry = new THREE.PlaneGeometry(20, 10);
-    var material = new THREE.MeshPhongMaterial( { color: 0xffcccc } );
-    var plane = new THREE.Mesh( geometry, material );
-    plane.receiveShadow = true;
-    scene.add(plane);
 
 
     // sphere
@@ -84,33 +86,21 @@ function set_up_scene() {
     const SEGMENTS = 50;
     const RINGS = 50;
     var sphere_geometry = new THREE.SphereGeometry(RADIUS, SEGMENTS, RINGS);
-    // var material = new THREE.MeshLambertMaterial( { color: 0x88ffff } );
     var sphere;
     var loader = new THREE.TextureLoader();
     loader.load("../images/color_etopo1_ice-1600.jpg", function (texture) {
 
         // Map the texture to the material.
-        var material = new THREE.MeshLambertMaterial({ map: texture,
-                                                       overdraw: 0.5 });
+        var material = new THREE.MeshLambertMaterial({ map: texture });
         sphere = new THREE.Mesh(sphere_geometry, material);
-        sphere.position.set(2, 1, 1);
+        sphere.position.set(0, 0, 0);   // sideways, away, up
+
         sphere.castShadow = true;
         sphere.receiveShadow = true;
         scene.add(sphere);
     });
 
-
-    // cone defined using cylinder geometry
-    // radiusTop, radiusBottom, height, ...
-    var geometry = new THREE.CylinderGeometry(1, 0, 3, 50, 50, false);
-    var material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-    var cylinder = new THREE.Mesh( geometry, material );
-    cylinder.position.set(-1,-2,1);
-    cylinder.rotation.x = -Math.PI / 2;
-    cylinder.castShadow = true;
-    scene.add( cylinder );
-
-    //render scene
+    // render scene
     var render = function () {
      requestAnimationFrame(render);
      renderer.render(scene, camera);
