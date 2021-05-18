@@ -1,0 +1,145 @@
+<html>
+<html>
+ <head>
+ <script src="../js/three.min.js"></script>
+  <script src="../js/OrbitControls.js"></script>
+  <script type="text/javascript">
+
+function set_up_scene() {
+
+    var lat = 35.885 * Math.PI / 180.;
+    var lon = -106.306 * Math.PI / 180.;
+    // Sunrise at summer solstice:
+    var subsolar_lon = 3.2226102170765776 * Math.PI / 180.;
+    var subsolar_lat = 23.43697580860745 * Math.PI / 180.;
+    // Sunset at summer solstice:
+    subsolar_lon = 144.16794151204923 * Math.PI / 180.;
+    subsolar_lat = 23.434223851472446 * Math.PI / 180.;
+
+    // scene
+    var scene = new THREE.Scene();
+
+    // camera: fov, aspect ratio, near frustrum, far frustrum.
+    // The frustum defines the closest and farthest distances
+    // that will be rendered by the camera.
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight,
+                                             0.1, 1000 );
+
+    // Set the camera position to be over the given lon, lat position.
+    // x, y and z are toward viewer, up, left
+    // but that's according to Earth's initial rotation (coords 0, 0)
+    // so actually, it's: in direction of prime meridian, up,
+    // toward Pacific Ocean.
+    // Set left coordinate according to latitude:
+    //camera.position.set(5, 0, 0);
+    const CAMDISTANCE = 4;
+    camera.position.set(Math.cos(lon) * CAMDISTANCE,
+                        Math.sin(lat) * CAMDISTANCE,
+                        -Math.sin(lon) * CAMDISTANCE);
+    console.log("Camera position:", camera.position);
+
+    // Look toward the sphere, which will be centered at 0, 0, 0
+    camera.lookAt(new THREE.Vector3( 0, 0, 0 ));
+
+    // renderer
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+
+    //controls
+    var controls = new THREE.OrbitControls( camera, renderer.domElement );
+
+    //show canvas
+    //var container = document.querySelector('#canvas-container');
+    var container = document.getElementById('canvas-container');
+    console.log("Container:", container);
+    container.appendChild(renderer.domElement);
+
+    // lights
+    const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+    scene.add(light);
+
+    // sphere
+    const RADIUS = 1;
+    const SEGMENTS = 50;
+    const RINGS = 50;
+    var sphere_geometry = new THREE.SphereGeometry(RADIUS, SEGMENTS, RINGS);
+    // var material = new THREE.MeshLambertMaterial( { color: 0x88ffff } );
+    var sphere;
+    var loader = new THREE.TextureLoader();
+    const rot90 = Math.PI / 2.;
+    loader.load("../images/color_etopo1_ice-1600.jpg", function (texture) {
+        // Try to set up a clipping plane.
+        // A plane is specified by a normal vector plus a number
+        // indicating displacement from the origin.
+        // The clipping plane is applied to the nightside texture,
+        // so it may seem backward: it points to the parts that are
+        // night, not day.
+        // Coordinates are: out from Greewich, north, toward Pacific
+        // but no
+        //var localPlane = new THREE.Plane( new THREE.Vector3( 1, 0, 0 ), .3 );
+        var clippingPlane = new THREE.Plane( new THREE.Vector3(
+            -Math.cos(subsolar_lon),
+            -Math.sin(subsolar_lat),
+            Math.sin(subsolar_lon)), 0);
+        renderer.localClippingEnabled = true;
+
+        // Map the texture to the material.
+        var material = new THREE.MeshLambertMaterial({
+            map: texture,
+            //clippingPlanes: [ clippingPlane ],
+            //clipShadows: true
+        });
+
+        sphere = new THREE.Mesh(sphere_geometry, material);
+        sphere.position.set(0, 0, 0);   // sideways, away, up
+
+        sphere.castShadow = true;
+        sphere.receiveShadow = true;
+        scene.add(sphere);
+    });
+
+    // Night side, rendered as a cloud layer with a clipping plane
+    //var material;
+    //var nightsideMap;
+    loader.load('../images/BlackMarble-1600.jpg', map => {
+        nightsideMap = map;
+        var clippingPlane = new THREE.Plane( new THREE.Vector3(
+            Math.cos(subsolar_lon),
+            Math.sin(subsolar_lat),
+            -Math.sin(subsolar_lon)), 0);
+
+        var geometry = new THREE.SphereGeometry(RADIUS + .05, SEGMENTS, RINGS);
+        var material = new THREE.MeshPhongMaterial({
+            map: map,
+            transparent: true,
+            clippingPlanes: [ clippingPlane ],
+            clipShadows: true
+        });
+
+        var nightside /* = this.clouds */ = new THREE.Mesh(geometry, material);
+        scene.add(nightside);
+    });
+
+    // render scene
+    var render = function () {
+        //console.log("scene:", scene);
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+    };
+
+    render();
+}
+
+</script>
+
+</head>
+<body style="background: black" onload="set_up_scene();">
+
+  <div id="canvas-container" style="position: absolute; left:0px; top:0px"></div>
+    var container = document.getElementById('canvas-container');
+
+ </body>
+</html>
