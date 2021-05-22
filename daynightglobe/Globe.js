@@ -7,8 +7,6 @@ class Globe extends THREE.Object3D {
 
         var that = this;
 
-        var lat = 35.885 * Math.PI / 180.;
-        var lon = -106.306 * Math.PI / 180.;
         // Sunrise at summer solstice:
         this.subsolar_lon = 3.2226102170765776 * Math.PI / 180.;
         this.subsolar_lat = 23.43697580860745 * Math.PI / 180.;
@@ -21,13 +19,7 @@ class Globe extends THREE.Object3D {
             'map': {
                 url: '../images/color_etopo1_ice-1600.jpg',
                 val: undefined
-            },
-            /*
-              'blackMarble': {
-              url: '../images/BlackMarble-1600.jpg',
-              val: undefined
-              }
-            */
+            }
         };
 
         var texturePromises = [], path = './';
@@ -36,21 +28,23 @@ class Globe extends THREE.Object3D {
             texturePromises.push(new Promise((resolve, reject) => {
                 var entry = textures[key]
                 var url = path + entry.url
-                loader.load(url,
-                            texture => {
-                                entry.val = texture;
-                                if (entry.val instanceof THREE.Texture) resolve(entry);
-                            },
-                            xhr => {
-                                console.log(url + ' ' + (xhr.loaded / xhr.total * 100) +
-                                            '% loaded');
-                            },
-                            xhr => {
-                                reject(new Error(xhr +
-                                                 'An error occurred loading while loading: ' +
-                                                 entry.url));
-                            }
-                           );
+                loader.load(
+                    url,
+                    texture => {
+                        entry.val = texture;
+                        if (entry.val instanceof THREE.Texture) resolve(entry);
+                    },
+                    xhr => {
+                        console.log(url + ' '
+                                    + (xhr.loaded / xhr.total * 100)
+                                    + '% loaded');
+                    },
+                    xhr => {
+                        reject(new Error(xhr +
+                                         'Error loading while loading: '
+                                         + entry.url));
+                    }
+                );
             }));
         }
 
@@ -73,7 +67,8 @@ class Globe extends THREE.Object3D {
                 Math.sin(subsolar_lat),
                 -Math.sin(subsolar_lon)), 0);
 
-            var geometry = new THREE.SphereGeometry(radius + .05, segments, segments);
+            var geometry = new THREE.SphereGeometry(radius + .05,
+                                                    segments, segments);
             var material = new THREE.MeshPhongMaterial({
                 map: map,
                 transparent: true,
