@@ -125,11 +125,17 @@ function set_up_scene() {
 
     // render scene
     var render = function () {
-        //console.log("scene:", scene);
         renderer.render(scene, camera);
-        requestAnimationFrame(render);
-    };
 
+        // Three.js's model seems to be to run in a continuous loop,
+        // sucking all browser cycles:
+        //requestAnimationFrame(render);
+        // but you can be a little kinder by requesting animation frames
+        // less often:
+        setTimeout( function() {
+            requestAnimationFrame( render );
+        }, 500 );
+    };
     render();
 }
 
@@ -139,7 +145,5 @@ function set_up_scene() {
 <body style="background: black" onload="set_up_scene();">
 
   <div id="canvas-container" style="position: absolute; left:0px; top:0px"></div>
-    var container = document.getElementById('canvas-container');
-
  </body>
 </html>
