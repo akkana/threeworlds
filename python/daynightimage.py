@@ -128,7 +128,7 @@ if __name__ == '__main__':
         observer = ephem.Observer()
         observer.lat = '35:53.1'     # 35.8849756
         observer.lon = '-106:18.36'  # -106.3061510
-        observer.elevation = 2100
+        observer.elevation = 2100    # About 7000'
         observer.name = "Observer at %s, %s" % (observer.lon, observer.lat)
 
     print(observer)

@@ -127,6 +127,32 @@ function set_up_scene() {
     var render = function () {
         renderer.render(scene, camera);
 
+/*
+        // scene.children[2].material.clippingPlanes
+        for (c in scene.children) {
+            try {
+                var material = scene.children[c].material;
+                var clips = material.clippingPlanes;
+                if (clips && clips.length == 1) {
+                    subsolar_lon += .2;
+                    var clippingPlane = new THREE.Plane( new THREE.Vector3(
+                        -Math.cos(subsolar_lon),
+                        -Math.sin(subsolar_lat),
+                        Math.sin(subsolar_lon)), 0);
+
+                    // XXX Now we have a new clipping plane definition.
+                    // But how do we apply it to the existing mesh?
+                    scene.children[c].material.clippingPLanes = clippingPlane;
+                    console.log("subsolar lon now", subsolar_lon);
+                }
+            } catch (err) {
+                console.log("c is", c, err);
+                if (c == 2)
+                    return;
+            }
+        }
+*/
+
         // Three.js's model seems to be to run in a continuous loop,
         // sucking all browser cycles:
         //requestAnimationFrame(render);

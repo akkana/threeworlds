@@ -16,6 +16,12 @@ summer solstice, so you may see latitude and longitude for the nature
 center, or for the subsolar point at various times of day during
 the northern hemisphere summer solstice.
 
+## Dependency
+
+Some of these examples use suncalc.js, available from my
+[webapps/analemma](https://github.com/akkana/webapps/blob/master/analemma/js/suncalc.js)
+project. They will look for it in ```/javascript/suncalc.js```.
+
 ## Running the examples
 
 Depending on your browser permissions, you may or may not be able to
