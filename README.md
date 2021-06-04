@@ -22,7 +22,13 @@ Some of these examples use suncalc.js, available from my
 [webapps/analemma](https://github.com/akkana/webapps/blob/master/analemma/js/suncalc.js)
 project. They will look for it in ```/javascript/suncalc.js```.
 
-## Running the examples
+## View the Examples, Live
+
+You can view some of the examples live on
+<a href="https://akkana.github.io/threeworlds/">ThreeWorlds
+on GitHub Pages</a>.
+
+## Running the Examples
 
 Depending on your browser permissions, you may or may not be able to
 load an example simply by loading its *index.html* file. The way
