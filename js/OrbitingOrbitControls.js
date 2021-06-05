@@ -1,3 +1,10 @@
+/* This is similar to the standard THREE.js OrbitControls
+ * except that it offers functions to orbit in X by a discrete amount,
+ * which can be bound to a key such as LEFT/RIGHT,
+ * if you use echteinfachtv's workaround from Jan 24, 2014 in
+ * https://github.com/mrdoob/three.js/issues/4327
+ */
+
 ( function () {
 
 	// Unlike TrackballControls, it maintains the "up" direction object.up (+Y by default).
@@ -111,7 +118,7 @@
 
 			this.listenToKeyEvents = function ( domElement ) {
 
-				domElement.addEventListener( 'keydown', onKeyDown );
+				// domElement.addEventListener( 'keydown', onKeyDown );
 				this._domElementKeyEvents = domElement;
 
 			};
@@ -135,7 +142,6 @@
 				state = STATE.NONE;
 
 			}; // this method is exposed, but perhaps it would be better if we can make it private...
-
 
 			this.update = function () {
 
@@ -470,7 +476,9 @@
 				const element = scope.domElement;
 				rotateLeft( 2 * Math.PI * rotateDelta.x / element.clientHeight ); // yes, height
 
-				rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+				// AKK: constrain to disallow Y changes
+				// rotateUp( 2 * Math.PI * rotateDelta.y / element.clientHeight );
+				rotateUp( 0 );
 				rotateStart.copy( rotateEnd );
 				scope.update();
 
@@ -526,6 +534,7 @@
 			}
 
 			function handleKeyDown( event ) {
+				console.log("handleKeyDown");
 
 				let needsUpdate = false;
 
@@ -865,7 +874,8 @@
 
 			}
 
-			function onKeyDown( event ) {
+			// function onKeyDown( event ) {
+			this.onKeyDown = function (event) {
 
 				if ( scope.enabled === false || scope.enablePan === false ) return;
 				handleKeyDown( event );

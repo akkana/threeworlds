@@ -68,7 +68,7 @@ is what the *directional-light* example does. That works fine,
 but it loses the pretty "Black Marble" image of Earth at night
 that the Python script used.
 
-## daynight-clipping and daynightglobe
+## daynightglobe and daynight-clipping
 
 One approach to getting the "black marble" imagery back is to render
 two layers on the globe: one for daytime Earth, one for nighttime.
