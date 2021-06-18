@@ -1,15 +1,16 @@
 
 class Globe extends THREE.Object3D {
-    constructor(radius, segments) {
+    constructor(radius, segments, date) {
         super()
 
         this.name = "Earth";
 
         var that = this;
 
-        // Sunrise at summer solstice:
-        this.subsolar_lon = 3.2226102170765776 * Math.PI / 180.;
-        this.subsolar_lat = 23.43697580860745 * Math.PI / 180.;
+        var subsolarPoint = SunCalc.getSubsolarPoint(date);
+        this.subsolar_lon = subsolarPoint['longitude'];
+        this.subsolar_lat = subsolarPoint['latitude'];
+        console.log("Subsolar point:", this.subsolar_lon, this.subsolar_lat);
 
         // instantiate a loader
         var loader = new THREE.TextureLoader();
@@ -63,9 +64,9 @@ class Globe extends THREE.Object3D {
         //var material;
         loader.load('../images/BlackMarble-1600.jpg', map => {
             var clippingPlane = new THREE.Plane( new THREE.Vector3(
-                Math.cos(subsolar_lon),
-                Math.sin(subsolar_lat),
-                -Math.sin(subsolar_lon)), 0);
+                -Math.cos(this.subsolar_lon),
+                -Math.sin(this.subsolar_lat),
+                Math.sin(this.subsolar_lon)), 0);
 
             var geometry = new THREE.SphereGeometry(radius + .05,
                                                     segments, segments);

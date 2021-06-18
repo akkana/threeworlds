@@ -16,6 +16,7 @@ date.setSeconds(0);
 console.log("lat", lat, "lon", lon, "date", date);
 
 // How long (milliseconds) to wait between animation frames?
+// Affects both dragging and the sun-motion animation.
 // Small -> takes more CPU, large -> jerky if you drag it
 const ANIM_TIME = 100;
 
@@ -23,8 +24,8 @@ const ANIM_TIME = 100;
 // Positive is the right direction for earth rotation.
 var rotationSpeed = 0; // 0.005;
 
-// How much to change rotationSpeed on left/right arrows
-var ROTATION_STEP_STEP = 0.005;
+// How much to change rotationSpeed on left/right arrows or when animating
+var ROTATION_STEP_STEP = 0.015;
 
 const RAD2DEG = Math.PI / 180.;
 
@@ -37,10 +38,6 @@ var ratio = window.innerWidth / window.innerHeight;
 var camera = new THREE.PerspectiveCamera(
     75, window.innerWidth / window.innerHeight,
     0.1, 10000);
-
-// Sunrise at summer solstice:
-var subsolar_lon = 3.2226102170765776 * RAD2DEG;
-var subsolar_lat = 23.43697580860745 * RAD2DEG;
 
 // Set the camera position to be over the given lon, lat position.
 // x, y and z are toward viewer, up, left
@@ -149,7 +146,7 @@ var radius = 32,
     segments = 32,
     rotation = 0;
 
-var globe = new Globe(radius, segments);
+var globe = new Globe(radius, segments, date);
 
 scene.add(globe);
 

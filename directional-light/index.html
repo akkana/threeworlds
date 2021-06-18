@@ -17,6 +17,7 @@ function set_up_scene() {
     // Sunset at summer solstice:
     subsolar_lon = 144.16794151204923 * Math.PI / 180.;
     subsolar_lat = 23.434223851472446 * Math.PI / 180.;
+    // XXX subsolar lat and lon aren't actually used yet.
 
     // scene
     var scene = new THREE.Scene();
@@ -63,6 +64,8 @@ function set_up_scene() {
     // directional light
     var directionalLight = new THREE.DirectionalLight(0xffffff);
     directionalLight.intensity = 1.5;
+    // The position of the light unfortunately doesn't change the
+    // fuzziness of the shadow. I haven't found anything that does.
     directionalLight.position.set(5, 0, 5);
     directionalLight.target.position.set(0, 0, 0);
 
